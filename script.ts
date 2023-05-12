@@ -1,26 +1,31 @@
-function normalizarTexto(texto : string){
-    return texto.trim().toLowerCase();
+async function fetchCursos() {
+  const response = await fetch('https://api.origamid.dev/json/cursos.json');
+  const data = await response.json();
+  mostrarCursos(data);
 }
 
-const input = document.querySelector("input");
-const total = localStorage.getItem('total')|| '0';
-if (input && total){
-    input.value = total;
-calcularGanho(Number (input.value));
+interface Curso {
+  nome : string;
+  horas: number;
+  aulas: number;
+  tags : string[];
+  idAulas: number[];
+  nivel : 'iniciante' | 'avançado';
+  gratuito: boolean;
 }
-
-function calcularGanho(value : number){
-    const p = document.querySelector('p');
-    if (p){
-    p.innerText = `ganho total : ${value + 100 - value * 0.2}`;
-    }
+function mostrarCursos(cursos: Curso[]) {
+  cursos.forEach(curso => {
+    const cursoElement = document.createElement('div');
+    cursoElement.innerHTML = `
+      <h2 style="color: ${curso.nivel === 'iniciante' ? 'blue' : 'red'}">${curso.nome}</h2>
+      <p>"${curso.aulas}" <p/>
+      <p>${curso.horas} horas</p>
+      <p>${curso.gratuito ? 'Gratuito' : 'Pago'}</p>
+      <p>${curso.tags.join(', ')}</p>
+      <p>${curso.idAulas.join(', ')}</p>
+      <p style="color: ${curso.nivel === 'iniciante' ? 'red' : 'blue'}">${curso.nivel}</p>
+    `;
+    document.body.appendChild(cursoElement);
+  });
 }
-
-function totalMudou(){
-    if (input){
-    localStorage.setItem("total", input.value); ;
-    calcularGanho(Number (input.value));
-    }
-}
-
-input?.addEventListener('keyup', totalMudou);
+fetchCursos();
