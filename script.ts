@@ -1,31 +1,44 @@
-async function fetchCursos() {
-  const response = await fetch('https://api.origamid.dev/json/cursos.json');
-  const data = await response.json();
-  mostrarCursos(data);
-}
 
 interface Curso {
-  nome : string;
-  horas: number;
+  nome: string;
   aulas: number;
-  tags : string[];
-  idAulas: number[];
-  nivel : 'iniciante' | 'avançado';
   gratuito: boolean;
+  horas: number;
+  idAulas: number[];
+  nivel : "iniciante "| "avançado";
+  tags: string[];
 }
-function mostrarCursos(cursos: Curso[]) {
-  cursos.forEach(curso => {
-    const cursoElement = document.createElement('div');
-    cursoElement.innerHTML = `
-      <h2 style="color: ${curso.nivel === 'iniciante' ? 'blue' : 'red'}">${curso.nome}</h2>
-      <p>"${curso.aulas}" <p/>
-      <p>${curso.horas} horas</p>
-      <p>${curso.gratuito ? 'Gratuito' : 'Pago'}</p>
-      <p>${curso.tags.join(', ')}</p>
-      <p>${curso.idAulas.join(', ')}</p>
-      <p style="color: ${curso.nivel === 'iniciante' ? 'red' : 'blue'}">${curso.nivel}</p>
-    `;
-    document.body.appendChild(cursoElement);
-  });
+
+
+
+async function fetchCursos() {
+  const response = await fetch('https://api.origamid.dev/json/cursos.json');
+  const json = await response.json();
+  handleCursos(json);
 }
+
 fetchCursos();
+
+function isCurso (value : unknown): value is Curso{
+      if(value&& typeof value ==='object'&& 'nome' in value && "horas" in value && "aulas" in value && "gratuito" in value && "idAulas" in value && "nivel" in value && "tags" in value){
+        return true;
+      }else{
+        return false;
+      }
+}
+
+function handleCursos(data : unknown){
+  if (Array.isArray(data)) {
+    data.filter(isCurso).forEach(item => {
+      document.body.innerHTML += `
+      <div>
+      <h2>${item.nome}</h2>
+      <p>${item.aulas}</p>
+      <p>${item.horas}</p>
+      <p>${item.nivel}</p>
+      <p>${item.tags.join (", ")}</p>
+      </div>
+      `;
+    });
+  }
+}
