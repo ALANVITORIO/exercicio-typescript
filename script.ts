@@ -1,11 +1,61 @@
-document.addEventListener('DOMContentLoaded', (event) => {
-const btnMobile = document.getElementById('btn-mobile') as HTMLButtonElement;
-const nav = document.getElementById('nav') as HTMLDivElement;
+interface Window {
+  UserData: any;
+}
 
-if (!btnMobile || !nav) return;
+window.UserData = {};
 
-    btnMobile.addEventListener('click', () => {
-        nav.classList.toggle('active');
-    });
-  });
+function validJSON(str: string) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
 
+interface UserData {
+  nome?: string;
+  email?: string;
+  cpf?: string;
+}
+
+function isUserData(obj: unknown): obj is UserData {
+  if (
+    obj &&
+    typeof obj === 'object' &&
+    ('nome' in obj || 'email' in obj || 'cpf' in obj)
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function loadLocalStorage() {
+  const localUserData = localStorage.getItem('UserData');
+  if (localUserData && validJSON(localUserData)) {
+    const UserData = JSON.parse(localUserData);
+    if (isUserData(UserData)) {
+      Object.entries(UserData).forEach(([key, value]) => {
+        const input = document.getElementById(key);
+        if (input instanceof HTMLInputElement) {
+          input.value = value;
+          window.UserData[key] = value;
+        }
+      });
+    }
+  }
+}
+console.log(window.UserData);
+
+loadLocalStorage();
+
+function handleInput({ target }: KeyboardEvent) {
+  if (target instanceof HTMLInputElement) {
+    window.UserData[target.id] = target.value;
+    localStorage.setItem('UserData', JSON.stringify(window.UserData));
+  }
+}
+
+const form = document.querySelector<HTMLElement>('#form');
+form?.addEventListener('keyup', handleInput);
