@@ -46,7 +46,6 @@ function loadLocalStorage() {
     }
   }
 }
-console.log(window.UserData);
 
 loadLocalStorage();
 

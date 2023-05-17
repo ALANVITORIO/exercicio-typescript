@@ -1,0 +1,10 @@
+{
+	"folders": [
+		{
+			"path": "typescript"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}
